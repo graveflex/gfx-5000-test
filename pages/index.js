@@ -12,13 +12,14 @@ export default function Client(props) {
   const [channel, setChannel] = useState(null)
 
   useEffect(()=>{
-    io.on('switch_stream', (name)=>{
+    socket.on('switch_stream', (name)=>{
       setChannel(name)
     })
     axios.get("http://64.227.30.198:3000")
     .then(({data})=>{
       setChannel(data.name)
     })
+    .catch((e)=>{console.log(e)})
   }, [])
 
   const VideoStream = ({streamName, index}) => {

@@ -5,24 +5,17 @@ import React, {useEffect, useState} from 'react';
 import Hls from "hls.js";
 import axios from "axios"
 import { io } from "socket.io-client";
-// const API_BASE_URL = "http://64.227.30.198"
-const API_BASE_URL = "localhost"
+const API_BASE_URL = "http://64.227.30.198"
+// const API_BASE_URL = "localhost"
 
-const socket = io(API_BASE_URL);
+const socket = io(`${API_BASE_URL}:3000`);
 
 export default function AdminPanel(props) {
   const [streams, setStreams] = useState([])
   const [channel, setChannel] = useState(null)
 
-  useEffect(()=>{
-    axios.get("http://64.227.30.198:3000")
-    .then(({data})=>{
-      setChannel(data.name)
-    })
-  }, [])
-
-  useEffect(() => {
-    axios.get("API_BASE_URL:8000/api/streams")
+  const getStreams = ()=>{
+    axios.get(`${API_BASE_URL}:8000/api/streams`)
     .then(({ data }) => {
       var streams = data.live
       const sts = Object.keys(streams).map((stream, i)=>{
@@ -30,13 +23,29 @@ export default function AdminPanel(props) {
       })
       setStreams(sts)
     })
+    .catch((e)=>{console.log(e)}) 
+  }
+
+  useEffect(()=>{
+    axios.get(`${API_BASE_URL}:3000`)
+    .then(({data})=>{
+      setChannel(data.name)
+    })
+    .catch((e)=>{console.log(e)})
+  }, [])
+
+  useEffect(() => {
+    socket.on('refetch', ()=>{
+      getStreams()
+    })
+    getStreams() 
   }, [])
 
   const VideoStream = ({streamName, index}) => {
     useEffect(()=>{
       var video = document.getElementById(`player${index}`)
       const hls = new Hls()
-      const url = `API_BASE_URL:8000/live/${streamName}/index.m3u8`
+      const url = `${API_BASE_URL}:8000/live/${streamName}/index.m3u8`
       hls.loadSource(url);
       hls.attachMedia(video);
     }, [])
