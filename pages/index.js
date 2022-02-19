@@ -5,6 +5,7 @@ import React, {useEffect, useState} from 'react';
 import Hls from "hls.js";
 import axios from "axios"
 import { io } from "socket.io-client";
+import Chat from "../components/chat";
 
 // // *** http ***
 // const streamPort = 7000
@@ -61,6 +62,7 @@ export default function Client(props) {
             <video id={`player`} autoPlay muted={muted} style={{height:"300px", width:"640px"}}></video>
           </div>:<div>Loading channel...</div>}
         <button onClick={()=>{setMuted(!muted)}}>{muted ? "Unmute": "Mute"}</button>
+        <Chat/>
       </div>
     </div>
   )
