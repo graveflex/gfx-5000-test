@@ -5,8 +5,22 @@ import React, {useEffect, useState} from 'react';
 import Hls from "hls.js";
 import axios from "axios"
 import { io } from "socket.io-client";
-const API_BASE_URL = "http://64.227.30.198"
-const socket = io(API_BASE_URL);
+
+// // *** http ***
+// const streamPort = 7000
+// // *** http ***
+// const apiPort = 8080
+// // *** local ***
+// const API_BASE_URL = "http://localhost"
+
+// *** https ***
+const streamPort = 7080
+// *** https ***
+const apiPort =  8443
+// *** remote ***
+const API_BASE_URL = "https://teeveedrop.com"
+
+const socket = io.connect(`${API_BASE_URL}:${apiPort}`);
 
 export default function Client(props) {
   const [channel, setChannel] = useState(null)
@@ -15,9 +29,9 @@ export default function Client(props) {
     socket.on('switch_stream', (name)=>{
       setChannel(name)
     })
-    axios.get("http://64.227.30.198:3000")
+    axios.get(`${API_BASE_URL}:${apiPort}`)
     .then(({data})=>{
-      setChannel(data.name)
+      setChannel(data.channel)
     })
     .catch((e)=>{console.log(e)})
   }, [])
@@ -26,7 +40,7 @@ export default function Client(props) {
     useEffect(()=>{
       var video = document.getElementById(`player${index}`)
       const hls = new Hls()
-      const url = `API_BASE_URL:8000/live/${streamName}/index.m3u8`
+      const url = `${API_BASE_URL}:${streamPort}/live/${streamName}/index.m3u8`
       hls.loadSource(url);
       hls.attachMedia(video);
     }, [streamName])
