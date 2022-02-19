@@ -68,7 +68,7 @@ export default function AdminPanel(props) {
     return <div>
         <div>Name: {streamName}</div>
         <div>Index: {index}</div>
-        <video id={`player${index}`} controls style={{height:"100px", width:"180px"}}></video>
+        <video id={`player${index}`}  muted autoPlay controls style={{height:"100px", width:"180px"}}></video>
         <button onClick={()=>{
           socket.emit("switch_stream", streamName);
         }}>Set as active</button>
@@ -81,7 +81,7 @@ export default function AdminPanel(props) {
       <div data-vjs-player>
       {streams.map((stream)=>{
         return <div style={{display:"inline-block", margin: "10px", border: stream.name == channel ? "5px solid red" : "1px solid black"}} key={`t${stream.index}`}>
-          <VideoStream controls style={{height:"100px", width:"180px"}} streamName={stream.name} index={stream.index}/>
+          <VideoStream style={{height:"100px", width:"180px"}} streamName={stream.name} index={stream.index}/>
         </div>
       })}
       </div>

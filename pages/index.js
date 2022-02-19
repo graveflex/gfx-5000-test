@@ -24,6 +24,8 @@ const socket = io.connect(`${API_BASE_URL}:${apiPort}`);
 
 export default function Client(props) {
   const [channel, setChannel] = useState(null)
+  const [muted, setMuted] = useState(true)
+  const [hls, setHls] = useState(null)
 
   useEffect(()=>{
     socket.on('switch_stream', (name)=>{
@@ -36,25 +38,29 @@ export default function Client(props) {
     .catch((e)=>{console.log(e)})
   }, [])
 
-  const VideoStream = ({streamName, index}) => {
-    useEffect(()=>{
-      var video = document.getElementById(`player${index}`)
-      const hls = new Hls()
-      const url = `${API_BASE_URL}:${streamPort}/live/${streamName}/index.m3u8`
-      hls.loadSource(url);
-      hls.attachMedia(video);
-    }, [streamName])
+  useEffect(()=>{
+    if(channel){
+      var video = document.getElementById(`player`)
+      if(hls){
+        hls.destroy()
+      }
+      const new_hls = new Hls()
+      const url = `${API_BASE_URL}:${streamPort}/live/${channel}/index.m3u8`
 
-    return <div>
-        <video id={`player${index}`} controls style={{height:"300px", width:"640px"}}></video>
-      </div>
-  }
+      new_hls.loadSource(url);
+      new_hls.attachMedia(video);
+      setHls(new_hls);
+    }
+  }, [channel])
 
   return (
     <div style={{margin:"30px"}}> 
       <h2>Client Panel</h2>
       <div data-vjs-player>
-        {channel?<VideoStream streamName={channel} index={0}/>:<div>Loading channel...</div>}
+          {channel?<div>
+            <video id={`player`} autoPlay muted={muted} style={{height:"300px", width:"640px"}}></video>
+          </div>:<div>Loading channel...</div>}
+        <button onClick={()=>{setMuted(!muted)}}>{muted ? "Unmute": "Mute"}</button>
       </div>
     </div>
   )
